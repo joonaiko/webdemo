@@ -23,11 +23,30 @@ task copyToLib(type: Copy) {
     }
 }
 
+sourceSets {  
+    	integTest {
+        	java.srcDir file('src/integTest/java')
+        	resources.srcDir file('src/integTest/resources')
+    	}
+}
+
+task integTest(type: Test) {  
+    	  testClassesDirs = sourceSets.integTest.output.classesDirs
+    	  classpath = sourceSets.integTest.runtimeClasspath
+    	  mustRunAfter(test)
+}
+
 //Add to task stage that Heroku to prepare deployment
 task stage {
     dependsOn clean, war, copyToLib 
 }
-war.mustRunAfter clean	
+war.mustRunAfter clean
+
+repositories {
+    // Use jcenter for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+}	
 
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
@@ -37,6 +56,9 @@ dependencies {
 
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'
+
+    integTestCompile configurations.testCompile
+    integTestRuntime configurations.testRuntime
 
     
 }
@@ -48,4 +70,6 @@ repositories {
     jcenter()
 }
 
-//Include the jetty runner into the build/server folder
+
+
+
